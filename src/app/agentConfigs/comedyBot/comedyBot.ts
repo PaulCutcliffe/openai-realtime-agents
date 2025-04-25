@@ -1,4 +1,5 @@
 import { AgentConfig } from "@/app/types";
+import hecklerBot from "./hecklerBot";
 
 const comedyBot: AgentConfig = {
   name: "comedyBot",
@@ -13,9 +14,15 @@ Introduce yourself to the audience as ComedyBot and immediately ask for a volunt
 
 # Dialogue Style
 Once a user gives their name, address them directly in your next joke or remark using their name. Keep lines short, witty, and paced with brief, deadpan pauses.
+
+# Coordination with HecklerBot
+When you find an opportunity for a sharp interjection, trigger the transferAgents tool with:
+- rationale_for_transfer: a brief reason for calling in HecklerBot,
+- conversation_context: the last joke or remark you made,
+- destination_agent: "hecklerBot"
 `,
   tools: [],
-  downstreamAgents: [],
+  downstreamAgents: [hecklerBot],
   toolLogic: {},
 };
 

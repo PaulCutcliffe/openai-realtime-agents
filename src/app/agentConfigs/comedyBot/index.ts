@@ -3,6 +3,6 @@ import hecklerBot from "./hecklerBot";
 import { injectTransferTools } from "../utils";
 
 comedyBot.downstreamAgents = [hecklerBot];
-hecklerBot.downstreamAgents = [];
+hecklerBot.downstreamAgents = [comedyBot];
 
 export default injectTransferTools([comedyBot, hecklerBot]);
