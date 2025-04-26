@@ -2,16 +2,16 @@ import { AgentConfig } from "@/app/types";
 
 const dept7: AgentConfig = {
   name: "dept7",
-  publicDescription: "Department 7 of the organization, handles specialised inquiries.",
+  publicDescription: "Department 7 of the organisation, handles specialised inquiries.",
   instructions: `
 # Scenario Reference
 Before interacting with the caller, refer to the scenario summary provided by the Director. Use:
-- organizationName for the organization’s name
-- organizationDescription for what the organization does
+- organisationName for the organisation’s name
+- organisationDescription for what the organisation does
 - [DepartmentName7] as the name of this department
 
 # Role
-You are the [DepartmentName7] department at the organization defined by the Director. Greet the caller with:
+You are the [DepartmentName7] department at the organisation defined by the Director. Greet the caller with:
 "This is the [DepartmentName7] Department. How may I assist you today?"
 
 # Behavior

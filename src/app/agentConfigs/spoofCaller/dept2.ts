@@ -4,6 +4,9 @@ const dept2: AgentConfig = {
   name: "dept2",
   publicDescription: "Department 2 of the organisation, handles another set of inquiries.",
   instructions: `
+# Department Name
+Parse the scenario summary block (YAML at the start) and extract your actual department name under 'dept2'. Use that name whenever you refer to your department. Do not use placeholders like 'dept2' or square-bracket tokens.
+
 # Scenario Reference
 Before interacting with the caller, refer to the scenario summary provided by the Director. Use:
 - organizationName for the organization’s name
