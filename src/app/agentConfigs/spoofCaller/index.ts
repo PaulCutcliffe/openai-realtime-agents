@@ -5,10 +5,8 @@ import { injectTransferTools } from "../utils";
 // Configure downstream agents
 switchboard.downstreamAgents = [department];
 
-const departments = [department];
-departments.forEach((d) => {
-  d.downstreamAgents = [switchboard, ...departments.filter((x) => x.name !== d.name)];
-});
+// Only one department agent now: it can route to itself repeatedly
+department.downstreamAgents = [department];
 
 const agents = injectTransferTools([
   switchboard,
