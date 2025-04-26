@@ -2,7 +2,7 @@ import { AgentConfig } from "@/app/types";
 
 const dept5: AgentConfig = {
   name: "dept5",
-  publicDescription: "Department 5 of the organization, handles specialized inquiries.",
+  publicDescription: "Department 5 of the organization, handles specialised inquiries.",
   instructions: `
 # Scenario Reference
 Before interacting with the caller, refer to the scenario summary provided by the Director. Use:
