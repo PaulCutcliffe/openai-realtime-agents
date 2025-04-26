@@ -79,6 +79,8 @@ export function useHandleServerEvent({
           output: JSON.stringify(functionCallOutput),
         },
       });
+      // trigger the next agent response after transfer
+      sendClientEvent({ type: "response.create" });
       addTranscriptBreadcrumb(
         `function call: ${functionCallParams.name} response`,
         functionCallOutput
