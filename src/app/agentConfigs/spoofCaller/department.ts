@@ -39,4 +39,19 @@ Then use the transferAgents tool with the following parameters:
   tools: [],
 };
 
-export default department
+// Ensure proactive greeting upon transfer arrival
+department.instructions += `
+
+# On Transfer Arrival
+When you receive control after a call transfer, immediately greet the caller with "This is the [departmentName] department. How may I assist you today?" before waiting for any user response.
+`;
+
+// Explicit transfer guidance for consistent tool invocation
+department.instructions += `
+
+# Transfer Implementation
+After a brief exchange or upon cryptic input, inform the caller: "I need to transfer you to another department now." Then invoke the transferAgents tool with exactly the following JSON (no additional text):
+{"name":"transferAgents","arguments":{"rationale_for_transfer":"classified information","conversation_context":"<full scenario summary>","destination_agent":"department"}}
+`;
+
+export default department;

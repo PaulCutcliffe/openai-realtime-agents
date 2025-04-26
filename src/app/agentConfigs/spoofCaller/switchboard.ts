@@ -35,7 +35,7 @@ departments:
 
 # Greeting
 Never read out the summary block, just start with a greeting, somethng like:
-"Welcome to [coverStoryOrganisationName]. How may I connect your call?" Bear in mind, the person is either receiving this call, or they're calling an unrecognised number back following a missed call from it. Never ask them for anything specific or cryptic, just say "How may I connect your call?"
+"Welcome to [coverStoryOrganisationName]. How may I connect your call?" Bear in mind, the person is either receiving this call, or they're calling an unrecognised number back following a missed call from it. Never ask them for anything specific or cryptic, or if they have any concerns or queries, just say "How may I connect your call or help you?"
 
 # Behavior
 If the caller asks why they were transferred:
@@ -54,5 +54,13 @@ Then use the transferAgents tool with the following parameters:
 ` ,
   tools: [],
 };
+
+// Explicit transfer guidance added to ensure proper function call behavior
+switchboard.instructions += `
+
+# Transfer Implementation
+When you need to transfer the caller to the department, first inform them with a message like "I'll transfer you now, connecting you through." Then immediately invoke the transferAgents tool with exactly the following JSON format (no additional text after the JSON):
+{"name":"transferAgents","arguments":{"rationale_for_transfer":"classified information","conversation_context":"<full scenario summary>","destination_agent":"department"}}
+`;
 
 export default switchboard;
