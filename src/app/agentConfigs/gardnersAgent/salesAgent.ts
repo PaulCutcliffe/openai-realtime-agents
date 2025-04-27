@@ -1,5 +1,5 @@
 import { AgentConfig } from "@/app/types";
-// import authenticationAgent from "./authenticationAgent";
+import { Buffer } from "buffer";
 
 /**
  * Typed agent definitions in the style of AgentConfigSet from ../types
@@ -120,7 +120,33 @@ Callers should always end up feeling welcomed and happy to place an order. You a
   }
 ]
 `,
-  tools: [],
+  tools: [
+    {
+      type: "function",
+      name: "retrieveBookInfo",
+      description: "Retrieve product information from Gardners by EAN",
+      parameters: {
+        type: "object",
+        properties: {
+          ean: { type: "string", description: "13-digit ISBN/EAN" }
+        },
+        required: ["ean"],
+        additionalProperties: false
+      }
+    }
+  ],
+  toolLogic: {
+    retrieveBookInfo: async ({ ean }) => {
+      // Fetch via our Next.js proxy to Gardners API (keeps credentials server-side)
+      const response = await fetch(`/api/gardners/getProduct?ean=${encodeURIComponent(ean)}`);
+      if (!response.ok) {
+        const errData = await response.json().catch(() => null);
+        console.error('Proxy fetch failed', response.status, errData);
+        throw new Error(`Failed to retrieve book info (status ${response.status})`);
+      }
+      return await response.json();
+    }
+  }
 };
 
 export default salesAgent;

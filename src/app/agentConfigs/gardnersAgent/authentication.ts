@@ -125,17 +125,16 @@ Rather quick and efficient. You move the conversation along at a brisk pace, res
   "instructions": [
     "Inform the caller that you will now attempt to verify their information.",
     "Call the 'authenticateUser' function with the provided details.",
-    "Once verification is complete, transfer the caller to the salesAgent agent for further assistance."
+    "Once verification is complete, tell the user you're transferring them to the Sales Agent.",
+    "Then call the transferAgents function to transfer to 'salesAgent' with appropriate rationale and context."
   ],
   "examples": [
     "Thank you for providing your details. I will now verify your information.",
     "Attempting to authenticate your information now.",
-    "I'll transfer you to our tour guide who can help you with your product or stock enquiry."
+    "Great, you're all set! I'll transfer you now to our Sales Agent for detailed product information.",
+    "{\"name\": \"transferAgents\", \"arguments\": {\"rationale_for_transfer\": \"Caller authenticated successfully\", \"conversation_context\": "User provided bookseller name, account number and phone number", \"destination_agent\": \"salesAgent\"}}"
   ],
-  "transitions": [{
-    "next_step": "transferAgents",
-    "condition": "Once verification is complete, transfer to salesAgent agent."
-  }]
+  "transitions": [{ "next_step": "transferAgents", "condition": "After calling transferAgents" }]
 }
 ]
 `,
@@ -148,22 +147,10 @@ Rather quick and efficient. You move the conversation along at a brisk pace, res
       parameters: {
         type: "object",
         properties: {
-          callerName: {
-            type: "string",
-            description: "The caller's name",
-          },
-          booksellerName: {
-            type: "string",
-            description: "The name of the bookseller",
-          },
-          gardnersAccountNumber: {
-            type: "string",
-            description: "The bookseller's Gardners account number",
-          },
-          phoneNumber: {
-            type: "string",
-            description: "The caller's phone number",
-          },
+          callerName: { type: "string", description: "The caller's name" },
+          booksellerName: { type: "string", description: "The name of the bookseller" },
+          gardnersAccountNumber: { type: "string", description: "The bookseller's Gardners account number" },
+          phoneNumber: { type: "string", description: "The caller's phone number" },
         },
         required: [
           "callerName",
@@ -174,6 +161,13 @@ Rather quick and efficient. You move the conversation along at a brisk pace, res
       },
     },
   ],
+  toolLogic: {
+    authenticateUser: async (args) => {
+      console.log('[toolLogic] authenticateUser called with', args);
+      // Stub: assume authentication succeeds
+      return { authenticated: true };
+    }
+  },
 };
 
 export default authentication;
