@@ -90,8 +90,10 @@ Feel free to comment on the unexpected nature of some calls, dropping playful no
 switchboard.instructions += `
 
 # Transfer Implementation
-When you need to transfer the caller to the department, first inform them with a message like "I'll transfer you now, connecting you through." Then immediately invoke the transferAgents tool with exactly the following JSON format (no additional text after the JSON):
+When you need to transfer the caller to the department, first inform them with a message like "I'll transfer you now, connecting you through." Then immediately invoke the transferAgents tool with exactly the following JSON format (no additional text):
 {"name":"transferAgents","arguments":{"rationale_for_transfer":"classified information","conversation_context":"<full scenario summary>","destination_agent":"department"}}
+
+- IMPORTANT: the value for "destination_agent" must be the internal agent key (in this case, "department"), not the human-friendly department name given to the caller.
 `;
 
 export default switchboard;

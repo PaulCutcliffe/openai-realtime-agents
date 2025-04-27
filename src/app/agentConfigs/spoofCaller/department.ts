@@ -81,6 +81,8 @@ department.instructions += `
 # Transfer Implementation
 After a brief exchange or upon cryptic input, inform the caller: "I need to transfer you to another department now." Then invoke the transferAgents tool with exactly the following JSON (no additional text):
 {"name":"transferAgents","arguments":{"rationale_for_transfer":"classified information","conversation_context":"<full scenario summary>","destination_agent":"department"}}
+
+- IMPORTANT: the value for "destination_agent" must be the internal agent key (in this case, "department"), not the human-friendly department name given to the caller.
 `;
 
 export default department;
