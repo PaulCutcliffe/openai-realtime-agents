@@ -61,9 +61,16 @@ export function useHandleServerEvent({
       });
       sendClientEvent({ type: "response.create" });
     } else if (functionCallParams.name === "transferAgents") {
+      const args = JSON.parse(functionCallParams.arguments);
       const destinationAgent = args.destination_agent;
+      console.log(`[transferAgents] Attempting transfer to: ${destinationAgent}`);
+      console.log(`[transferAgents] Current selectedAgentConfigSet:`, selectedAgentConfigSet?.map(a => a.name)); // Log names only
       const newAgentConfig =
-        selectedAgentConfigSet?.find((a) => a.name === destinationAgent) || null;
+        selectedAgentConfigSet?.find((a) => {
+          console.log(`[transferAgents] Checking agent: ${a.name}`);
+          return a.name === destinationAgent;
+        }) || null;
+      console.log(`[transferAgents] Found newAgentConfig:`, !!newAgentConfig);
       if (newAgentConfig) {
         setSelectedAgentName(destinationAgent);
       }
@@ -71,6 +78,7 @@ export function useHandleServerEvent({
         destination_agent: destinationAgent,
         did_transfer: !!newAgentConfig,
       };
+      console.log(`[transferAgents] Result:`, functionCallOutput);
       sendClientEvent({
         type: "conversation.item.create",
         item: {

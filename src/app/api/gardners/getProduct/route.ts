@@ -3,14 +3,16 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
   const ean = req.nextUrl.searchParams.get('ean');
+  const username = req.nextUrl.searchParams.get('username');
+  const password = req.nextUrl.searchParams.get('password');
+
   if (!ean) {
     return NextResponse.json({ error: 'Missing EAN parameter' }, { status: 400 });
   }
-  const username = process.env.GARDNERS_API_USERNAME;
-  const password = process.env.GARDNERS_API_PASSWORD;
   if (!username || !password) {
-    return NextResponse.json({ error: 'Gardners API credentials not configured' }, { status: 500 });
+    return NextResponse.json({ error: 'Missing Gardners API credentials in request' }, { status: 400 });
   }
+
   const url = `https://gws.gardners.com/api/Product/GetProduct/?EAN=${ean}`;
   try {
     const response = await fetch(url, {
