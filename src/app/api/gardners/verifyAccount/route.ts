@@ -5,12 +5,44 @@ import { compareTwoStrings } from 'string-similarity'; // Import the library
 
 // Helper function to normalize bookseller names for comparison
 function normalizeName(name: string): string {
-  return name
+  let normalized = name
     .toLowerCase()
-    .replace(/^the\s+/, '') // Remove leading "the "
-    .replace(/[^\w\s]/g, '') // Remove punctuation
-    .replace(/\s+/g, ' ') // Normalize whitespace
+    // Replace common abbreviations/symbols before removing punctuation
+    .replace(/&/g, 'and')
+    .replace(/\bltd\b/g, '') // Remove 'ltd' as a whole word
+    .replace(/\binc\b/g, '') // Remove 'inc' as a whole word
+    // Remove leading 'the '
+    .replace(/^the\s+/, '')
+    // Remove all non-alphanumeric characters (except spaces)
+    .replace(/[^a-z0-9\s]/g, '')
+    // Normalize whitespace
+    .replace(/\s+/g, ' ')
     .trim();
+
+  // Define words to remove from the end if they are not the only word
+  const trailingWordsToRemove = ['books', 'bookshop'];
+
+  for (const word of trailingWordsToRemove) {
+    const suffix = ` ${word}`;
+    if (normalized.endsWith(suffix)) {
+      const baseName = normalized.substring(0, normalized.length - suffix.length).trim();
+      // Only remove the suffix if the base name is not empty
+      if (baseName.length > 0) {
+        normalized = baseName;
+        // Optional: break if you only expect one such suffix, or remove to handle multiple (e.g., "X Books Bookshop")
+        break;
+      }
+    }
+  }
+  // Also handle the case where the name *is* just the word itself (e.g. "Books")
+  // If the normalized name exactly matches one of the trailing words, don't modify it further in this step.
+  if (trailingWordsToRemove.includes(normalized)) {
+      // If the name was *just* "books" or "bookshop" after initial cleanup, keep it as is.
+      // This check might be redundant given the baseName.length > 0 check above, but adds clarity.
+  }
+
+
+  return normalized;
 }
 
 export async function POST(request: Request) {
