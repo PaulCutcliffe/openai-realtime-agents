@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/string-similarity": "^4.0.2",
     "next": "^15.3.1",
     "openai": "^4.77.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^9.0.3",
+    "string-similarity": "^4.0.4",
     "uuid": "^11.0.4"
   },
   "devDependencies": {

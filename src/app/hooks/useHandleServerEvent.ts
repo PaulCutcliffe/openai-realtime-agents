@@ -34,15 +34,38 @@ export function useHandleServerEvent({
   const handleFunctionCall = async (functionCallParams: {
     name: string;
     call_id?: string;
-    arguments: string;
+    arguments: string; // This is the JSON string of arguments
   }) => {
-    const args = JSON.parse(functionCallParams.arguments);
+    let parsedOuter: any = {};
+    let args: any = {}; // This should hold the actual arguments object
+    try {
+      // Parse the string received in the arguments property
+      parsedOuter = JSON.parse(functionCallParams.arguments);
+      console.log(`[handleFunctionCall] Raw parsed object from arguments string for ${functionCallParams.name}:`, parsedOuter);
+
+      // Check if the parsed object unexpectedly contains the function name and a nested arguments object
+      if (parsedOuter.name === functionCallParams.name && typeof parsedOuter.arguments === 'object') {
+        console.log(`[handleFunctionCall] Detected nested structure. Using inner arguments object.`);
+        args = parsedOuter.arguments; // Use the nested arguments object
+      } else {
+        console.log(`[handleFunctionCall] Assuming direct arguments structure in parsed string.`);
+        args = parsedOuter; // Assume the string directly contained the arguments object
+      }
+      console.log(`[handleFunctionCall] Final args object for ${functionCallParams.name}:`, args);
+
+    } catch (error) {
+      console.error(`[handleFunctionCall] Failed to parse arguments string for ${functionCallParams.name}:`, functionCallParams.arguments, error);
+      return; // Stop processing if args can't be parsed
+    }
+
     const currentAgent = selectedAgentConfigSet?.find(
       (a) => a.name === selectedAgentName
     );
 
+    // Add breadcrumb with the final, correctly extracted args object
     addTranscriptBreadcrumb(`function call: ${functionCallParams.name}`, args);
 
+    // The rest of the function uses the 'args' object, which should now be correct
     if (currentAgent?.toolLogic?.[functionCallParams.name]) {
       const fn = currentAgent.toolLogic[functionCallParams.name];
       const fnResult = await fn(args, transcriptItems);
@@ -61,22 +84,27 @@ export function useHandleServerEvent({
       });
       sendClientEvent({ type: "response.create" });
     } else if (functionCallParams.name === "transferAgents") {
-      const args = JSON.parse(functionCallParams.arguments);
-      const destinationAgent = args.destination_agent;
-      console.log(`[transferAgents] Attempting transfer to: ${destinationAgent}`);
+      // Now args should correctly contain { destination_agent: "...", ... }
+      const destinationAgentName = args.destination_agent;
+      console.log(`[transferAgents] Attempting transfer to: ${destinationAgentName}`);
       console.log(`[transferAgents] Current selectedAgentConfigSet:`, selectedAgentConfigSet?.map(a => a.name)); // Log names only
       const newAgentConfig =
         selectedAgentConfigSet?.find((a) => {
           console.log(`[transferAgents] Checking agent: ${a.name}`);
-          return a.name === destinationAgent;
+          return a.name === destinationAgentName; // Use the requested name for comparison
         }) || null;
       console.log(`[transferAgents] Found newAgentConfig:`, !!newAgentConfig);
+
+      let didTransfer = false;
       if (newAgentConfig) {
-        setSelectedAgentName(destinationAgent);
+        setSelectedAgentName(newAgentConfig.name); // Use the name from the found config
+        didTransfer = true;
       }
+
       const functionCallOutput = {
-        destination_agent: destinationAgent,
-        did_transfer: !!newAgentConfig,
+        // Report the agent name we *attempted* to transfer to
+        destination_agent: destinationAgentName,
+        did_transfer: didTransfer, // Use the boolean flag
       };
       console.log(`[transferAgents] Result:`, functionCallOutput);
       sendClientEvent({
@@ -84,6 +112,7 @@ export function useHandleServerEvent({
         item: {
           type: "function_call_output",
           call_id: functionCallParams.call_id,
+          // Send the result back to the LLM
           output: JSON.stringify(functionCallOutput),
         },
       });
