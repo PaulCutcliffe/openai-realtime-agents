@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "realtime-examples",
   "version": "0.1.0",
   "private": true,
@@ -7,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:ean": "ts-node -e \"const { isValidEan13 } = require('./src/app/agentConfigs/gardnersAgent/salesAgent.ts'); const samples=['4006381333931','1234567890123','9783161484100']; console.log('EAN','Valid?'); samples.forEach(ean => console.log(ean, isValidEan13(ean)));\""
+    "test:ean": "node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node test-ean.ts"
   },
   "dependencies": {
     "@types/string-similarity": "^4.0.2",
