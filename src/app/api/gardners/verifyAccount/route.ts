@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { compareTwoStrings } from 'string-similarity'; // Import the library
+import { compareTwoStrings } from 'string-similarity'; // Import similarity library
+import { DoubleMetaphone } from 'natural'; // Import phonetic algorithm
 
 // Helper function to normalize bookseller names for comparison
 function normalizeName(name: string): string {
@@ -99,10 +100,20 @@ export async function POST(request: Request) {
 
     // Use string similarity for comparison
     const similarity = compareTwoStrings(providedNormalized, expectedNormalized);
-    verified = similarity >= similarityThreshold;
+    // Use DoubleMetaphone phonetic matching
+    const dm = new DoubleMetaphone();
+    const [expCode1, expCode2] = dm.process(expectedNormalized);
+    const [provCode1, provCode2] = dm.process(providedNormalized);
+    const phoneticMatch =
+      expCode1 === provCode1 || expCode1 === provCode2 ||
+      expCode2 === provCode1 || expCode2 === provCode2;
+    verified = phoneticMatch || similarity >= similarityThreshold;
 
     // Log comparison details
-    console.log(`[verifyAccount API] Comparing normalized names: Provided='${providedNormalized}', Expected='${expectedNormalized}', Similarity=${similarity.toFixed(2)}, Threshold=${similarityThreshold}, Match=${verified}`);
+    console.log(
+      `[verifyAccount API] Provided='${providedNormalized}', Expected='${expectedNormalized}', ` +
+      `Similarity=${similarity.toFixed(2)}, PhoneticMatch=${phoneticMatch}, Threshold=${similarityThreshold}, Verified=${verified}`
+    );
 
   } else {
     console.log(`[verifyAccount API] Account code '${codeUpper}' (derived from '${originalCodeUpper}') not found in map.`);
