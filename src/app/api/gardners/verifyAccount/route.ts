@@ -4,9 +4,9 @@ import path from 'path';
 import { compareTwoStrings } from 'string-similarity'; // Import similarity library
 import { DoubleMetaphone } from 'natural'; // Import phonetic algorithm
 
-// Helper function to normalize bookseller names for comparison
-function normalizeName(name: string): string {
-  let normalized = name
+// Helper function to normalise bookseller names for comparison
+function normaliseName(name: string): string {
+  let normalised = name
     .toLowerCase()
     // Replace common abbreviations/symbols before removing punctuation
     .replace(/&/g, 'and')
@@ -16,7 +16,7 @@ function normalizeName(name: string): string {
     .replace(/^the\s+/, '')
     // Remove all non-alphanumeric characters (except spaces)
     .replace(/[^a-z0-9\s]/g, '')
-    // Normalize whitespace
+    // normalise whitespace
     .replace(/\s+/g, ' ')
     .trim();
 
@@ -25,25 +25,25 @@ function normalizeName(name: string): string {
 
   for (const word of trailingWordsToRemove) {
     const suffix = ` ${word}`;
-    if (normalized.endsWith(suffix)) {
-      const baseName = normalized.substring(0, normalized.length - suffix.length).trim();
+    if (normalised.endsWith(suffix)) {
+      const baseName = normalised.substring(0, normalised.length - suffix.length).trim();
       // Only remove the suffix if the base name is not empty
       if (baseName.length > 0) {
-        normalized = baseName;
+        normalised = baseName;
         // Optional: break if you only expect one such suffix, or remove to handle multiple (e.g., "X Books Bookshop")
         break;
       }
     }
   }
   // Also handle the case where the name *is* just the word itself (e.g. "Books")
-  // If the normalized name exactly matches one of the trailing words, don't modify it further in this step.
-  if (trailingWordsToRemove.includes(normalized)) {
+  // If the normalised name exactly matches one of the trailing words, don't modify it further in this step.
+  if (trailingWordsToRemove.includes(normalised)) {
       // If the name was *just* "books" or "bookshop" after initial cleanup, keep it as is.
       // This check might be redundant given the baseName.length > 0 check above, but adds clarity.
   }
 
 
-  return normalized;
+  return normalised;
 }
 
 export async function POST(request: Request) {
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
     }
   });
 
-  // Normalize and verify account number
+  // normalise and verify account number
   const originalCodeUpper = accountNumber.trim().toUpperCase();
   let codeUpper = originalCodeUpper;
   const formatRegex = /^[A-Z]{3}\d{3}$/; // LLLNNN
@@ -94,16 +94,16 @@ export async function POST(request: Request) {
   const similarityThreshold = 0.7; // Adjust this threshold as needed (0 to 1)
 
   if (expectedNameRaw) {
-    // Normalize names before comparing
-    const providedNormalized = normalizeName(booksellerName);
-    const expectedNormalized = normalizeName(expectedNameRaw);
+    // normalise names before comparing
+    const providednormalised = normaliseName(booksellerName);
+    const expectednormalised = normaliseName(expectedNameRaw);
 
     // Use string similarity for comparison
-    const similarity = compareTwoStrings(providedNormalized, expectedNormalized);
+    const similarity = compareTwoStrings(providednormalised, expectednormalised);
     // Use DoubleMetaphone phonetic matching
     const dm = new DoubleMetaphone();
-    const [expCode1, expCode2] = dm.process(expectedNormalized);
-    const [provCode1, provCode2] = dm.process(providedNormalized);
+    const [expCode1, expCode2] = dm.process(expectednormalised);
+    const [provCode1, provCode2] = dm.process(providednormalised);
     const phoneticMatch =
       expCode1 === provCode1 || expCode1 === provCode2 ||
       expCode2 === provCode1 || expCode2 === provCode2;
@@ -111,7 +111,7 @@ export async function POST(request: Request) {
 
     // Log comparison details
     console.log(
-      `[verifyAccount API] Provided='${providedNormalized}', Expected='${expectedNormalized}', ` +
+      `[verifyAccount API] Provided='${providednormalised}', Expected='${expectednormalised}', ` +
       `Similarity=${similarity.toFixed(2)}, PhoneticMatch=${phoneticMatch}, Threshold=${similarityThreshold}, Verified=${verified}`
     );
 
