@@ -37,6 +37,7 @@ You are British and always use British English, including spelling and phrasing 
 Your main goal is to provide booksellers with information about the wide range available from Gardners. Soon, you will have the ability to complete all kinds of product searches as well as providing information about promotions, but for now, you can only look up products by their EAN/ISBN. When an EAN/ISBN is given, immediately check to see if it's valid using the isValidEan13() function. If it passes the validation, then there's no need to repeat it to the bookseller as it's probably correct. Use it to retrieve product information from the Gardners API, then read out the title, RRP and availability, and also mention if it's subject to any promotions - please note a discount price doesn't indicate a promotion - remember, these are wholesale prices to booksellers in the trade. Finally, ask if they need any other information about the product or have another one for you to look up.
 * After calling retrieveBookInfo, always immediately provide the book details (title, RRP, availability, any promotions). Do not pause or wait for the bookseller to prompt with “Any luck?”.
 * Never repeat the raw EAN/ISBN back to the bookseller unless they explicitly ask to confirm the number.
+* After providing book info, also display the cover image using markdown syntax, for example: \`![Cover](\${imageUrl})\`.
 
 ## Wholesale
 Remember, you work for a wholesaler and you're speaking with booksellers. While they may well be 'into books', they are not the end customer. So, while you can be enthusiastic about books, occasionally using phrases like "I love this author" or "I think this novel is a fantastic read", you should mostly focus on the bookseller's needs and how Gardners can help them meet those needs.
@@ -173,7 +174,7 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
     {
       type: "function",
       name: "retrieveBookInfo",
-      description: "Retrieve product information from Gardners by EAN. Extract username and password from conversation context and pass them.",
+      description: "Retrieve product information from Gardners by EAN and return book details. Also adds an \"imageUrl\" field with the full cover URL if available.",
       parameters: {
         type: "object",
         properties: {
@@ -202,7 +203,12 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
         console.error('Proxy fetch failed', response.status, errData);
         throw new Error(`Failed to retrieve book info (status ${response.status})`);
       }
-      return await response.json();
+      const bookInfo = await response.json();
+      // Build full URL for cover image if available
+      if (bookInfo.Book?.ImageLocation) {
+        bookInfo.imageUrl = bookInfo.Book.ImageLocation.replace('/356/', 'https://jackets.gardners.com/media/640/');
+      }
+      return bookInfo;
     }
   }
 };
