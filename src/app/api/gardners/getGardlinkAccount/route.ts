@@ -7,7 +7,7 @@ export async function GET() {
   let pool: sql.ConnectionPool | null = null;
   try {
     // Use a connection string
-    const connectionString = 'Server=localhost\\\\SQLExpress;Database=Gardlink4;Integrated Security=true;TrustServerCertificate=true';
+    const connectionString = 'Server=localhost\\\\SQLExpress;Database=Gardlink4;User ID=sa;Password=Gardlink2023;TrustServerCertificate=true';
     pool = await sql.connect(connectionString);
     
     console.log("[API /api/gardners/getGardlinkAccount] Connected to DB");
