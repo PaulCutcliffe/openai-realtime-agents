@@ -1,0 +1,8 @@
+{
+  "id": "all_products",
+  "title": "List All Products",
+  "description": "Retrieves all records from the Product table.",
+  "database": "Gardlink4",
+  "sqlQuery": "SELECT [EAN], [Title] FROM [Gardlink].[Product];",
+  "parameters": []
+}
