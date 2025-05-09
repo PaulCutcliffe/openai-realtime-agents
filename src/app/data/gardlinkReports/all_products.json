@@ -1,7 +1,7 @@
 {
   "id": "all_products",
-  "title": "List All Products",
-  "description": "Retrieves all records from the Product table.",
+  "title": "List All Product EANs and Titles",
+  "description": "Retrieves all records from the Product table and displays the EAN & Title columns.",
   "database": "Gardlink4",
   "sqlQuery": "SELECT [EAN], [Title] FROM [Gardlink].[Product];",
   "parameters": []

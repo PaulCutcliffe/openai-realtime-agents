@@ -45,6 +45,14 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
     - Greet the user.
     - Spell out the Gardners account number clearly. For example, if the account number is "ABC123", you should say "Your Gardners account number is A. B. C. one. two. three."
 3. If the tool returns an error or no account number, inform the user that you were unable to retrieve the account number from the local Gardlink database.
+4. After successful account retrieval, ask the user if they would like to list available Gardlink reports or run a specific one.
+5. If the user wants to list reports, invoke the \`listGardlinkReports\` tool and present the list.
+6. If the user wants to run a report, ask for the report ID and invoke the \`runGardlinkReport\` tool.
+    - If the tool is successful, it will return the number of records found and the first few records (up to 5).
+    - Inform the user that the report ran successfully and state the total number of records returned (e.g., "The 'all_products' report ran successfully and found 150 records.").
+    - Ask the user if they would like to see the first few records. If they say yes, present only the 'firstFewRecords' provided by the tool.
+    - Do NOT attempt to list all records or any records beyond what the tool provides in 'firstFewRecords'.
+    - If the tool returns an error, present the error message.
  `,
   tools: [
     {
@@ -55,6 +63,33 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
         type: "object",
         properties: {},
         required: [],
+        additionalProperties: false
+      }
+    },
+    {
+      type: "function",
+      name: "listGardlinkReports",
+      description: "Lists all available Gardlink reports that can be run.",
+      parameters: {
+        type: "object",
+        properties: {},
+        required: [],
+        additionalProperties: false
+      }
+    },
+    {
+      type: "function",
+      name: "runGardlinkReport",
+      description: "Runs a specific Gardlink report by its ID and returns the results.",
+      parameters: {
+        type: "object",
+        properties: {
+          reportId: {
+            type: "string",
+            description: "The ID of the report to run (e.g., 'all_products')."
+          }
+        },
+        required: ["reportId"],
         additionalProperties: false
       }
     }
@@ -83,6 +118,65 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
       } catch (err: any) {
         console.error("[getGardnersAccountNumberFromLocalDB tool] Error fetching account number from API:", err);
         return { error: "Failed to retrieve account number due to a network or unexpected error.", details: err.message };
+      }
+    },
+    listGardlinkReports: async () => {
+      console.log("[listGardlinkReports tool] Attempting to list reports via API...");
+      try {
+        const response = await fetch('/api/gardners/listGardlinkReports'); // Fetch from the API route
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: "API request failed with status: " + response.status, details: "Could not parse error response." }));
+          console.error("[listGardlinkReports tool] API call failed:", response.status, errorData);
+          return { error: errorData.error || "Failed to list reports via API.", details: errorData.details };
+        }
+        const result = await response.json();
+        if (result.error) {
+          console.log("[listGardlinkReports tool] API returned an error:", result.error);
+          return { error: result.error, details: result.details };
+        }
+        if (!result.reports) {
+            console.log("[listGardlinkReports tool] API response did not contain reports array.");
+            return { error: "Invalid response from report listing API.", details: "No reports array found." };
+        }
+        console.log(`[listGardlinkReports tool] Successfully fetched ${result.reports.length} reports via API.`);
+        return { reports: result.reports, message: result.message || "" };
+      } catch (err: any) {
+        console.error("[listGardlinkReports tool] Error fetching reports via API:", err);
+        return { error: "Failed to list Gardlink reports due to a network or unexpected error.", details: err.message };
+      }
+    },
+    runGardlinkReport: async ({ reportId }: { reportId: string }) => {
+      console.log(`[runGardlinkReport tool] Attempting to run report: ${reportId}`);
+      try {
+        const response = await fetch('/api/gardners/runGardlinkReport', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ reportId }),
+        });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: "API request failed with status: " + response.status, details: "Could not parse error response." }));
+          console.error(`[runGardlinkReport tool] API call failed for report ${reportId}:`, response.status, errorData);
+          return { error: errorData.error || `Failed to run report ${reportId} via API.`, details: errorData.details };
+        }
+        const result = await response.json();
+        if (result.error) {
+            console.log(`[runGardlinkReport tool] API returned an error for report ${reportId}:`, result.error);
+            return { error: result.error, details: result.details };
+        }
+        const numberOfRecords = result.data ? result.data.length : 0;
+        const firstFewRecords = result.data ? result.data.slice(0, 5) : [];
+        console.log(`[runGardlinkReport tool] Successfully ran report ${reportId}. Records returned: ${numberOfRecords}`);
+        return {
+          reportId: reportId,
+          numberOfRecords: numberOfRecords,
+          firstFewRecords: firstFewRecords,
+          message: `Report '${reportId}' executed successfully. Found ${numberOfRecords} records.`
+        };
+      } catch (err: any) {
+        console.error(`[runGardlinkReport tool] Error running report ${reportId} via API:`, err);
+        return { error: `Failed to run report ${reportId} due to a network or unexpected error.`, details: err.message };
       }
     }
   },
