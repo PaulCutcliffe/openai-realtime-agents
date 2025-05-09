@@ -11,6 +11,7 @@
     "test:ean": "node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node test-ean.ts"
   },
   "dependencies": {
+    "@types/sqlite3": "^3.1.11",
     "@types/string-similarity": "^4.0.2",
     "mssql": "^11.0.1",
     "natural": "^8.0.1",
@@ -19,6 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-markdown": "^9.0.3",
+    "sqlite3": "^5.1.7",
     "string-similarity": "^4.0.4",
     "uuid": "^11.0.4"
   },
