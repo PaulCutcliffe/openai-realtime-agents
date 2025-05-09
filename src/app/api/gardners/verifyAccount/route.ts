@@ -9,9 +9,9 @@ function normaliseName(name: string): string {
   let normalised = name
     .toLowerCase()
     // Replace common abbreviations/symbols before removing punctuation
-    .replace(/&/g, 'and')
+    .replace(/&/g, 'and') // Replace '&' with 'and'
     .replace(/\bltd\b/g, '') // Remove 'ltd' as a whole word
-    .replace(/\binc\b/g, '') // Remove 'inc' as a whole word
+    .replace(/\blimited\b/g, '') // Remove 'limited' as a whole word
     // Remove leading 'the '
     .replace(/^the\s+/, '')
     // Remove all non-alphanumeric characters (except spaces)
