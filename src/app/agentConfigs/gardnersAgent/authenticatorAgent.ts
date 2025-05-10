@@ -5,6 +5,7 @@ import { AgentConfig } from "@/app/types";
  */
 const authenticatorAgent: AgentConfig = {
   name: "authenticatorAgent",
+  voice: "echo",
   publicDescription:
     "Handles calls by attempting to retrieve Gardlink details, or securely collecting and verifying bookseller information if Gardlink is unavailable.",
   instructions: `

@@ -68,7 +68,7 @@ const ReportViewer: React.FC<ReportViewerProps> = ({ reportFileId }) => {
               {headers.map(header => (
                 <td 
                   key={`${rowIndex}-${header}`} 
-                  className="px-6 py-4 whitespace-nowrap text-sm text-gray-800"
+                  className="px-2 py-1 whitespace-nowrap text-xs text-gray-700" // Reduced padding and font size
                 >
                   {String(row[header])}
                 </td>

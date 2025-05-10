@@ -30,6 +30,7 @@ export interface AgentConfig {
   publicDescription: string; // gives context to agent transfer tool
   instructions: string;
   tools: Tool[];
+  voice?: string; // Added voice property
   toolLogic?: Record<
     string,
     (args: any, transcriptLogsFiltered: TranscriptItem[]) => Promise<any> | any

@@ -1,5 +1,5 @@
 import authenticationAgent from "./authenticatorAgent";
-import gardnersSalesAgent from "./salesAgent";
+import gardnersSalesAgent from "./gardnersSalesAgent";
 import { injectTransferTools } from '../utils';
 
 authenticationAgent.downstreamAgents = [gardnersSalesAgent]

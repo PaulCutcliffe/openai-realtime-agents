@@ -1,0 +1,8 @@
+{
+  "id": "all_products_with_pricing",
+  "title": "List All Product EANs, Titles and Pricing Information",
+  "description": "Retrieves all records from the Product table and displays the EAN, Title and Pricing Information.",
+  "database": "Gardlink4",
+  "sqlQuery": "SELECT [EAN], [Title], [RetailPrice], [RRP], [YouPayPrice], [YouPayPriceIncVat], [LastPurchaseCost] FROM [Gardlink].[Product] ORDER BY [RRP] DESC;",
+  "parameters": []
+}
