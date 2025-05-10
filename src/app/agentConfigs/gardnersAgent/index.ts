@@ -1,11 +1,10 @@
-import gardlinkReporterAgent from "./gardlinkReporterAgent";
-import authenticationAgent from "./authentication";
-import salesAgent from "./salesAgent";
+import authenticationAgent from "./authenticatorAgent";
+import gardnersSalesAgent from "./salesAgent";
 import { injectTransferTools } from '../utils';
 
-authenticationAgent.downstreamAgents = [salesAgent]
-salesAgent.downstreamAgents = [authenticationAgent]
+authenticationAgent.downstreamAgents = [gardnersSalesAgent]
+gardnersSalesAgent.downstreamAgents = [authenticationAgent]
 
-const agents = injectTransferTools([authenticationAgent, salesAgent, gardlinkReporterAgent]);
+const agents = injectTransferTools([authenticationAgent, gardnersSalesAgent]);
 
 export default agents;

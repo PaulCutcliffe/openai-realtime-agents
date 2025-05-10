@@ -63,19 +63,53 @@ export async function GET() {
     pool = await sql.connect(connectionString);
     console.log("[API /api/gardners/getGardlinkAccount] Connected to MSSQL DB");
 
-    const result = await pool.request()
+    // Query for GardnersAccountCode
+    const accountResult = await pool.request()
       .query`SELECT TOP 1 [GardnersAccountCode] FROM [Gardlink4].[Gardlink].[SupplierDetail] WHERE [SupplierAccountNumber] = 1 AND [DateDeleted] IS NULL ORDER BY [SupplierDetailID] DESC`;
     
-    console.log("[API /api/gardners/getGardlinkAccount] MSSQL Query executed");
+    console.log("[API /api/gardners/getGardlinkAccount] MSSQL Query for Account Code executed");
 
-    if (result.recordset && result.recordset.length > 0 && result.recordset[0].GardnersAccountCode) {
-      const accountNumber = result.recordset[0].GardnersAccountCode;
+    let accountNumber: string | null = null;
+    if (accountResult.recordset && accountResult.recordset.length > 0 && accountResult.recordset[0].GardnersAccountCode) {
+      accountNumber = accountResult.recordset[0].GardnersAccountCode;
       console.log(`[API /api/gardners/getGardlinkAccount] Account number found: ${accountNumber}`);
-      return NextResponse.json({ accountNumber });
     } else {
       console.log("[API /api/gardners/getGardlinkAccount] No account number found in MSSQL");
-      return NextResponse.json({ error: "No Gardners account number found in the local Gardlink database." }, { status: 404 });
+      // Do not return immediately, we still want to try fetching company details
     }
+
+    // Query for Company Details
+    const companyResult = await pool.request()
+      .query`SELECT TOP 1 [CompanyName], [GardnersWebAPI_UserName], [GardnersWebAPI_Password] FROM [Gardlink4].[Gardlink].[Company] WHERE [Active] = 1 ORDER BY [CompanyID] DESC;`;
+
+    console.log("[API /api/gardners/getGardlinkAccount] MSSQL Query for Company Details executed");
+
+    let companyName: string | null = null;
+    let gardnersApiUsername: string | null = null;
+    let gardnersApiPassword: string | null = null;
+
+    if (companyResult.recordset && companyResult.recordset.length > 0) {
+      const companyRecord = companyResult.recordset[0];
+      companyName = companyRecord.CompanyName || null;
+      gardnersApiUsername = companyRecord.GardnersWebAPI_UserName || null;
+      gardnersApiPassword = companyRecord.GardnersWebAPI_Password || null;
+      console.log(`[API /api/gardners/getGardlinkAccount] Company details found: Name=${companyName}, API User=${gardnersApiUsername}`);
+    } else {
+      console.log("[API /api/gardners/getGardlinkAccount] No company details found in MSSQL");
+    }
+
+    if (accountNumber || companyName) { // Return success if we found at least account number or company name
+      return NextResponse.json({ 
+        accountNumber, 
+        companyName,
+        gardnersApiUsername,
+        gardnersApiPassword
+      });
+    } else {
+      // If neither account number nor company details were found
+      return NextResponse.json({ error: "No Gardners account number or company details found in the local Gardlink database." }, { status: 404 });
+    }
+
   } catch (mssqlErr: any) {
     console.error("[API /api/gardners/getGardlinkAccount] MSSQL Error:", mssqlErr);
     const errorMessage = mssqlErr && mssqlErr.message ? mssqlErr.message : String(mssqlErr);
