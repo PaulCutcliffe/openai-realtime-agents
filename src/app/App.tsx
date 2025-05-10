@@ -395,19 +395,13 @@ function App() {
   }, [isAudioPlaybackEnabled]);
 
   useEffect(() => {
-    // When Preview Data is toggled off, clear the current report file ID
-    if (!isPreviewDataVisible) {
-      setCurrentReportFileId(null);
+    if (sessionStatus === "CONNECTED") {
+      console.log(
+        `updatingSession, isPTTACtive=${isPTTActive} sessionStatus=${sessionStatus}`
+      );
+      updateSession();
     }
-    // Optional: Persist isPreviewDataVisible to localStorage if desired
-    // localStorage.setItem("isPreviewDataVisible", isPreviewDataVisible.toString());
-  }, [isPreviewDataVisible]);
-
-  useEffect(() => {
-    if (audioElementRef.current) {
-      audioElementRef.current.autoplay = isAudioPlaybackEnabled;
-    }
-  }, [isAudioPlaybackEnabled]);
+  }, [isPTTActive]);
 
   const agentSetKey = searchParams.get("agentConfig") || "default";
 

@@ -124,8 +124,8 @@ function BottomToolbar({
           id="preview-data"
           type="checkbox"
           checked={isPreviewDataVisible}
-          onChange={e => setIsPreviewDataVisible(e.target.checked)}
-          disabled={!isConnected} // Assuming it should be enabled only when connected
+          onChange={e => setIsPreviewDataVisible(e.target.checked)} // This now only sets isPreviewDataVisible
+          disabled={!isConnected} 
           className="w-4 h-4"
         />
         <label htmlFor="preview-data" className="flex items-center cursor-pointer">
