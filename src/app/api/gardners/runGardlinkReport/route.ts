@@ -3,6 +3,7 @@ import sql from 'mssql';
 import * as sqlite3 from 'sqlite3';
 import fs from 'fs/promises';
 import path from 'path';
+import { v4 as uuidv4 } from 'uuid'; // Added import for uuid
 
 // Helper function to get SQL Server password from SQLite
 const getSQLServerPasswordFromSQLite = (): Promise<string> => {
@@ -102,7 +103,24 @@ export async function POST(request: Request) {
     const result = await pool.request().query(report.sqlQuery);
     
     console.log("[API /api/gardners/runReport] MSSQL Query executed successfully.");
-    return NextResponse.json({ data: result.recordset });
+
+    // Save full results to a temporary file
+    const reportFileId = uuidv4();
+    const tempDir = path.join(process.cwd(), 'tmp', 'reports');
+    await fs.mkdir(tempDir, { recursive: true }); // Ensure directory exists
+    const tempFilePath = path.join(tempDir, `${reportFileId}.json`);
+    await fs.writeFile(tempFilePath, JSON.stringify(result.recordset));
+    console.log(`[API /api/gardners/runReport] Full report data saved to ${tempFilePath}`);
+
+    // Return a subset of data for immediate display and the file ID
+    const summaryData = result.recordset.slice(0, 5); // First 5 records for summary
+    return NextResponse.json({ 
+      summary: {
+        count: result.recordset.length,
+        data: summaryData,
+      },
+      reportFileId: reportFileId // Added reportFileId to the response
+    });
 
   } catch (error: any) {
     console.error("[API /api/gardners/runReport] Error executing report or MSSQL operation:", error);

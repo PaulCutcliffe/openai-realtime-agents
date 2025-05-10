@@ -48,9 +48,10 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
 4. After successful account retrieval, ask the user if they would like to list available Gardlink reports or run a specific one.
 5. If the user wants to list reports, invoke the \`listGardlinkReports\` tool and present the list.
 6. If the user wants to run a report, ask for the report ID and invoke the \`runGardlinkReport\` tool.
-    - If the tool is successful, it will return the number of records found and the first few records (up to 5).
+    - If the tool is successful, it will return a summary (count of records, first few records) and a \`reportFileId\`.
     - Inform the user that the report ran successfully and state the total number of records returned (e.g., "The 'all_products' report ran successfully and found 150 records.").
-    - Ask the user if they would like to see the first few records. If they say yes, present only the 'firstFewRecords' provided by the tool.
+    - Ask the user if they would like to see the first few records. If they say yes, present only the 'firstFewRecords' (summary.data) provided by the tool.
+    - After potentially showing the summary, inform the user that the full dataset can be viewed using the ID: [reportFileId]. Ask if they would like to view the full dataset.
     - Do NOT attempt to list all records or any records beyond what the tool provides in 'firstFewRecords'.
     - If the tool returns an error, present the error message.
  `,
@@ -165,14 +166,23 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
             console.log(`[runGardlinkReport tool] API returned an error for report ${reportId}:`, result.error);
             return { error: result.error, details: result.details };
         }
-        const numberOfRecords = result.data ? result.data.length : 0;
-        const firstFewRecords = result.data ? result.data.slice(0, 5) : [];
-        console.log(`[runGardlinkReport tool] Successfully ran report ${reportId}. Records returned: ${numberOfRecords}`);
+        // Updated to handle the new response structure with summary and reportFileId
+        if (!result.summary || typeof result.summary.count !== 'number' || !Array.isArray(result.summary.data) || !result.reportFileId) {
+            console.error(`[runGardlinkReport tool] Invalid response structure from API for report ${reportId}:`, result);
+            return { error: `Invalid response structure from API for report ${reportId}.` };
+        }
+
+        const numberOfRecords = result.summary.count;
+        const firstFewRecords = result.summary.data;
+        const reportFileId = result.reportFileId;
+
+        console.log(`[runGardlinkReport tool] Successfully ran report ${reportId}. Records: ${numberOfRecords}, File ID: ${reportFileId}`);
         return {
           reportId: reportId,
           numberOfRecords: numberOfRecords,
           firstFewRecords: firstFewRecords,
-          message: `Report '${reportId}' executed successfully. Found ${numberOfRecords} records.`
+          reportFileId: reportFileId, // Added reportFileId
+          message: `Report '${reportId}' executed successfully. Found ${numberOfRecords} records. Full data available with ID: ${reportFileId}.`
         };
       } catch (err: any) {
         console.error(`[runGardlinkReport tool] Error running report ${reportId} via API:`, err);
