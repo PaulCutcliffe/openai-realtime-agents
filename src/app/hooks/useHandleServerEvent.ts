@@ -3,7 +3,7 @@
 import { ServerEvent, SessionStatus, AgentConfig } from "@/app/types";
 import { useTranscript } from "@/app/contexts/TranscriptContext";
 import { useEvent } from "@/app/contexts/EventContext";
-import { useRef } from "react";
+import { useRef, Dispatch, SetStateAction } from "react"; // Added Dispatch, SetStateAction
 
 export interface UseHandleServerEventParams {
   setSessionStatus: (status: SessionStatus) => void;
@@ -11,6 +11,8 @@ export interface UseHandleServerEventParams {
   selectedAgentConfigSet: AgentConfig[] | null;
   sendClientEvent: (eventObj: any, eventNameSuffix?: string) => void;
   setSelectedAgentName: (name: string) => void;
+  setCurrentReportFileId: Dispatch<SetStateAction<string | null>>; // Added prop
+  setIsPreviewDataVisible: Dispatch<SetStateAction<boolean>>; // Added prop
   shouldForceResponse?: boolean;
 }
 
@@ -20,6 +22,8 @@ export function useHandleServerEvent({
   selectedAgentConfigSet,
   sendClientEvent,
   setSelectedAgentName,
+  setCurrentReportFileId, // Destructure prop
+  setIsPreviewDataVisible, // Destructure prop
 }: UseHandleServerEventParams) {
   const {
     transcriptItems,
@@ -73,6 +77,13 @@ export function useHandleServerEvent({
         `function call result: ${functionCallParams.name}`,
         fnResult
       );
+
+      // Check if the function result contains a reportFileId and set it
+      if (fnResult && typeof fnResult === 'object' && 'reportFileId' in fnResult && typeof fnResult.reportFileId === 'string') {
+        console.log(`[useHandleServerEvent] Tool ${functionCallParams.name} returned reportFileId: ${fnResult.reportFileId}`);
+        setCurrentReportFileId(fnResult.reportFileId);
+        setIsPreviewDataVisible(true); // Automatically show the report viewer
+      }
 
       sendClientEvent({
         type: "conversation.item.create",
@@ -212,7 +223,8 @@ export function useHandleServerEvent({
                 call_id: outputItem.call_id,
                 arguments: outputItem.arguments,
               });
-            }
+            } 
+            // Removed the erroneous 'else if (outputItem.type === "text" ...)' block here
           });
         }
         break;

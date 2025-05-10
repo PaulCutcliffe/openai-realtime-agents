@@ -13,6 +13,8 @@ interface BottomToolbarProps {
   setIsEventsPaneExpanded: (val: boolean) => void;
   isAudioPlaybackEnabled: boolean;
   setIsAudioPlaybackEnabled: (val: boolean) => void;
+  isPreviewDataVisible: boolean; // Added prop
+  setIsPreviewDataVisible: (val: boolean) => void; // Added prop
 }
 
 function BottomToolbar({
@@ -27,6 +29,8 @@ function BottomToolbar({
   setIsEventsPaneExpanded,
   isAudioPlaybackEnabled,
   setIsAudioPlaybackEnabled,
+  isPreviewDataVisible, // Added prop
+  setIsPreviewDataVisible, // Added prop
 }: BottomToolbarProps) {
   const isConnected = sessionStatus === "CONNECTED";
   const isConnecting = sessionStatus === "CONNECTING";
@@ -111,6 +115,21 @@ function BottomToolbar({
         />
         <label htmlFor="logs" className="flex items-center cursor-pointer">
           Logs
+        </label>
+      </div>
+
+      {/* Added Preview Data checkbox */}
+      <div className="flex flex-row items-center gap-2">
+        <input
+          id="preview-data"
+          type="checkbox"
+          checked={isPreviewDataVisible}
+          onChange={e => setIsPreviewDataVisible(e.target.checked)}
+          disabled={!isConnected} // Assuming it should be enabled only when connected
+          className="w-4 h-4"
+        />
+        <label htmlFor="preview-data" className="flex items-center cursor-pointer">
+          Preview Data
         </label>
       </div>
     </div>

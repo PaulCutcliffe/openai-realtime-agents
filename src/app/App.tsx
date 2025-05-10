@@ -10,6 +10,7 @@ import Image from "next/image";
 import Transcript from "./components/Transcript";
 import Events from "./components/Events";
 import BottomToolbar from "./components/BottomToolbar";
+import ReportViewer from "./components/ReportViewer";
 
 // Types
 import { AgentConfig, SessionStatus } from "@/app/types";
@@ -50,6 +51,8 @@ function App() {
   const [isPTTUserSpeaking, setIsPTTUserSpeaking] = useState<boolean>(false);
   const [isAudioPlaybackEnabled, setIsAudioPlaybackEnabled] =
     useState<boolean>(true);
+  const [isPreviewDataVisible, setIsPreviewDataVisible] = useState<boolean>(false);
+  const [currentReportFileId, setCurrentReportFileId] = useState<string | null>(null);
 
   const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
     if (dcRef.current && dcRef.current.readyState === "open") {
@@ -73,6 +76,8 @@ function App() {
     selectedAgentConfigSet,
     sendClientEvent,
     setSelectedAgentName,
+    setCurrentReportFileId, // Pass setter
+    setIsPreviewDataVisible, // Pass setter
   });
 
   useEffect(() => {
@@ -390,14 +395,17 @@ function App() {
   }, [isAudioPlaybackEnabled]);
 
   useEffect(() => {
+    // When Preview Data is toggled off, clear the current report file ID
+    if (!isPreviewDataVisible) {
+      setCurrentReportFileId(null);
+    }
+    // Optional: Persist isPreviewDataVisible to localStorage if desired
+    // localStorage.setItem("isPreviewDataVisible", isPreviewDataVisible.toString());
+  }, [isPreviewDataVisible]);
+
+  useEffect(() => {
     if (audioElementRef.current) {
-      if (isAudioPlaybackEnabled) {
-        audioElementRef.current.play().catch((err) => {
-          console.warn("Autoplay may be blocked by browser:", err);
-        });
-      } else {
-        audioElementRef.current.pause();
-      }
+      audioElementRef.current.autoplay = isAudioPlaybackEnabled;
     }
   }, [isAudioPlaybackEnabled]);
 
@@ -494,7 +502,12 @@ function App() {
           }
         />
 
-        <Events isExpanded={isEventsPaneExpanded} />
+        {/* Conditionally render ReportViewer or Events pane */}
+        {isPreviewDataVisible && currentReportFileId ? (
+          <ReportViewer reportFileId={currentReportFileId} />
+        ) : (
+          <Events isExpanded={isEventsPaneExpanded} />
+        )}
       </div>
 
       <BottomToolbar
@@ -509,6 +522,8 @@ function App() {
         setIsEventsPaneExpanded={setIsEventsPaneExpanded}
         isAudioPlaybackEnabled={isAudioPlaybackEnabled}
         setIsAudioPlaybackEnabled={setIsAudioPlaybackEnabled}
+        isPreviewDataVisible={isPreviewDataVisible} // Pass state
+        setIsPreviewDataVisible={setIsPreviewDataVisible} // Pass setter
       />
     </div>
   );
