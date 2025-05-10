@@ -40,7 +40,7 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
 - Maintain a supportive and attentive demeanor to ensure the bookseller feels comfortable and informed.
 
 # Task
-1. Invoke the \`getGardnersAccountNumberFromLocalDB\` tool.
+1. Invoke the \`getGardnersAccountNumberFromGardlinkDB\` tool.
 2. If the tool returns an account number:
     - Greet the user.
     - Spell out the Gardners account number clearly. For example, if the account number is "ABC123", you should say "Your Gardners account number is A. B. C. one. two. three."
@@ -58,7 +58,7 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
   tools: [
     {
       type: "function",
-      name: "getGardnersAccountNumberFromLocalDB",
+      name: "getGardnersAccountNumberFromGardlinkDB",
       description: "Connects to the local SQL Server Express Gardlink4 database (via an API route) and retrieves the Gardners account number.",
       parameters: {
         type: "object",
@@ -96,13 +96,13 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
     }
   ],
   toolLogic: {
-    getGardnersAccountNumberFromLocalDB: async () => {
-      console.log("[getGardnersAccountNumberFromLocalDB tool] Attempting to fetch account number via API...");
+    getGardnersAccountNumberFromGardlinkDB: async () => {
+      console.log("[getGardnersAccountNumberFromGardlinkDB tool] Attempting to fetch account number via API...");
       try {
         const response = await fetch('/api/gardners/getGardlinkAccount');
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({ error: "API request failed with status: " + response.status }));
-          console.error("[getGardnersAccountNumberFromLocalDB tool] API call failed:", response.status, errorData);
+          console.error("[getGardnersAccountNumberFromGardlinkDB tool] API call failed:", response.status, errorData);
           return { error: errorData.error || "Failed to retrieve account number from API." };
         }
         const result = await response.json();
@@ -110,14 +110,14 @@ Your speech is on the faster side, thanks to your enthusiasm. You sometimes paus
           console.log(`Successfully retrieved account number: ${result.accountNumber}`);
           return { accountNumber: result.accountNumber };
         } else if (result.error) {
-          console.log("[getGardnersAccountNumberFromLocalDB tool] API returned an error:", result.error);
+          console.log("[getGardnersAccountNumberFromGardlinkDB tool] API returned an error:", result.error);
           return { error: result.error };
         } else {
-          console.log("[getGardnersAccountNumberFromLocalDB tool] No account number found in API response.");
+          console.log("[getGardnersAccountNumberFromGardlinkDB tool] No account number found in API response.");
           return { error: "No Gardners account number found via API." };
         }
       } catch (err: any) {
-        console.error("[getGardnersAccountNumberFromLocalDB tool] Error fetching account number from API:", err);
+        console.error("[getGardnersAccountNumberFromGardlinkDB tool] Error fetching account number from API:", err);
         return { error: "Failed to retrieve account number due to a network or unexpected error.", details: err.message };
       }
     },
