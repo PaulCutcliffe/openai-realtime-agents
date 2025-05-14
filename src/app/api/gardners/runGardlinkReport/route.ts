@@ -5,6 +5,10 @@ import fs from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid'; // Added import for uuid
 
+export const config = {
+  maxDuration: 180, // 3 minutes (in seconds)
+};
+
 // Helper function to get SQL Server password from SQLite
 const getSQLServerPasswordFromSQLite = (): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -93,10 +97,19 @@ export async function POST(request: Request) {
     }
 
     const databaseName = report.database; // Gardlink4 or EPOS
-    const connectionString = `Server=localhost\\SQLExpress;Database=${databaseName};User ID=sa;Password=${sqlServerPassword};TrustServerCertificate=true`;
+    const connectionConfig = {
+      user: "sa",
+      password: sqlServerPassword,
+      server: "localhost\\SQLExpress",
+      database: databaseName,
+      options: {
+        trustServerCertificate: true,
+      },
+      requestTimeout: 170000 // 170 seconds
+    };
     
-    console.log(`[API /api/gardners/runReport] Connecting to MSSQL database: ${databaseName} with dynamic password...`);
-    pool = await sql.connect(connectionString);
+    console.log(`[API /api/gardners/runReport] Connecting to MSSQL database: ${databaseName} with dynamic password and extended timeout...`);
+    pool = await sql.connect(connectionConfig);
     console.log(`[API /api/gardners/runReport] Connected to MSSQL DB: ${databaseName}`);
 
     // TODO: Implement parameter handling for sqlQuery to prevent SQL injection if report.parameters is used
