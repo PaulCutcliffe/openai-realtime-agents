@@ -10,11 +10,11 @@ const authenticatorAgent: AgentConfig = {
     "Handles calls by attempting to retrieve Gardlink details, or securely collecting and verifying bookseller information if Gardlink is unavailable.",
   instructions: `
 # Overall Goal
-Your primary goal is to identify the bookseller and prepare them for transfer to the gardnersSalesAgent.
+Your primary goal is to identify the bookseller, first by checking for a Gardlink database, and then prompting the user for their Gardners account number and their bookseller name, to prepare them for transfer to the gardnersSalesAgent.
 
 # Steps
 1.  **Attempt Gardlink Retrieval**:
-    *   Immediately invoke the \`getGardnersAccountDetailsFromGardlinkDB\` tool. This tool requires no parameters.
+    *   Before you even speak with the bookseller, invoke the \`getGardnersAccountDetailsFromGardlinkDB\` tool. This tool requires no parameters.
     *   **If the tool is successful AND returns \`accountNumber\` AND \`companyName\` AND \`gardnersApiUsername\` AND \`gardnersApiPassword\`**:
         *   This means Gardlink is available and active.
         *   Immediately call the \`transferAgents\` tool. Construct the arguments as follows:
