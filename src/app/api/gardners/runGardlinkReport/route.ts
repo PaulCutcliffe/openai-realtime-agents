@@ -112,8 +112,16 @@ export async function POST(request: Request) {
     pool = await sql.connect(connectionConfig);
     console.log(`[API /api/gardners/runReport] Connected to MSSQL DB: ${databaseName}`);
 
-    // TODO: Implement parameter handling for sqlQuery to prevent SQL injection if report.parameters is used
-    const result = await pool.request().query(report.sqlQuery);
+    // Prepare a parameterised query if parameters are provided
+    const requestObj = pool.request();
+    if (Array.isArray(report.parameters)) {
+      for (const p of report.parameters) {
+        if (!p || !p.name) continue;
+        const sqlType = (sql as any)[p.type] || sql.NVarChar;
+        requestObj.input(p.name, sqlType, p.value);
+      }
+    }
+    const result = await requestObj.query(report.sqlQuery);
     
     console.log("[API /api/gardners/runReport] MSSQL Query executed successfully.");
 
