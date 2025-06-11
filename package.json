@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:ean": "node --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node test-ean.ts"
+    "test:ean": "node test-ean.js"
   },
   "dependencies": {
     "@types/sqlite3": "^3.1.11",

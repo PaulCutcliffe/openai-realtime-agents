@@ -50,13 +50,17 @@ export const TranscriptProvider: FC<PropsWithChildren> = ({ children }) => {
     });
   };
 
-  const updateTranscriptMessage: TranscriptContextValue["updateTranscriptMessage"] = (itemId, newText, append = false) => {
+  const updateTranscriptMessage: TranscriptContextValue["updateTranscriptMessage"] = (
+    itemId,
+    newText,
+    isDelta = false
+  ) => {
     setTranscriptItems((prev) =>
       prev.map((item) => {
         if (item.itemId === itemId && item.type === "MESSAGE") {
           return {
             ...item,
-            title: append ? (item.title ?? "") + newText : newText,
+            title: isDelta ? (item.title ?? "") + newText : newText,
           };
         }
         return item;

@@ -8,7 +8,7 @@ type EventContextValue = {
   loggedEvents: LoggedEvent[];
   logClientEvent: (eventObj: Record<string, any>, eventNameSuffix?: string) => void;
   logServerEvent: (eventObj: Record<string, any>, eventNameSuffix?: string) => void;
-  toggleExpand: (id: number | string) => void;
+  toggleExpand: (id: string) => void;
 };
 
 const EventContext = createContext<EventContextValue | undefined>(undefined);
