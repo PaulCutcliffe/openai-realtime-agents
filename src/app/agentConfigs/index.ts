@@ -6,6 +6,7 @@ import skynetCredits from "./skynetCredits";
 import frontDeskAuthentication from "./frontDeskAuthentication";
 import customerServiceRetail from "./customerServiceRetail";
 import simpleExample from "./simpleExample";
+import educationalTool from "./educationalTool";
 
 export const allAgentSets: AllAgentConfigsType = {
   comedyBot, 
@@ -15,6 +16,7 @@ export const allAgentSets: AllAgentConfigsType = {
   frontDeskAuthentication,
   customerServiceRetail,
   simpleExample,
+  educationalTool,
 };
 
 export const defaultAgentSetKey = "gardnersAgent";
