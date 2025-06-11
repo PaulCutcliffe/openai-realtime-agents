@@ -20,7 +20,7 @@ const ReportViewer: React.FC<ReportViewerProps> = ({ reportFileId }) => {
       setIsLoading(true);
       setError(null);
       try {
-        // This endpoint doesn't exist yet, we'll create it later
+        // Fetch report data from the server
         const response = await fetch(`/api/gardners/getReportFileContent?fileId=${reportFileId}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch report data: ${response.statusText}`);
