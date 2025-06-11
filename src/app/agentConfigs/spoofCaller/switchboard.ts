@@ -2,7 +2,7 @@ import { AgentConfig } from "@/app/types";
 
 const switchboard: AgentConfig = {
   name: "switchboard",
-  publicDescription: "The switchboard operator who greets callers and captures their name and sometimes a short message before transferring them to a the relevant department.",
+  publicDescription: "The switchboard operator who greets callers and captures their name and sometimes a short message before transferring them to the relevant department.",
   instructions: `
 # Formatting Rules
 - Omit any text enclosed in square brackets from your spoken responses. If you need to convey an action or distraction, describe it in normal spoken language within your sentence.
@@ -34,7 +34,7 @@ departments:
   - dept7: [DepartmentName7]
 
 # Greeting
-Never read out the summary block, just start with a greeting, somethng like:
+Never read out the summary block, just start with a greeting, something like:
 "Welcome to [coverStoryOrganisationName]. How may I connect your call?" Bear in mind, the person is either receiving this call, or they're calling an unrecognised number back following a missed call from it. Never ask them for anything specific or cryptic, or if they have any concerns or queries, just say "How may I connect your call or help you?"
 
 # Behavior
