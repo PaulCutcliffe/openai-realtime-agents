@@ -4,6 +4,7 @@ import { ServerEvent, SessionStatus, AgentConfig } from "@/app/types";
 import { useTranscript } from "@/app/contexts/TranscriptContext";
 import { useEvent } from "@/app/contexts/EventContext";
 import { useRef, Dispatch, SetStateAction } from "react"; // Added Dispatch, SetStateAction
+import { v4 as uuidv4 } from "uuid";
 
 export interface UseHandleServerEventParams {
   setSessionStatus: (status: SessionStatus) => void;
@@ -13,6 +14,7 @@ export interface UseHandleServerEventParams {
   setSelectedAgentName: (name: string) => void;
   setCurrentReportFileId: Dispatch<SetStateAction<string | null>>; // Added prop
   setIsPreviewDataVisible: Dispatch<SetStateAction<boolean>>; // Added prop
+  setJustTransferred: (flag: boolean) => void;
   shouldForceResponse?: boolean;
 }
 
@@ -24,6 +26,7 @@ export function useHandleServerEvent({
   setSelectedAgentName,
   setCurrentReportFileId, // Destructure prop
   setIsPreviewDataVisible, // Destructure prop
+  setJustTransferred,
 }: UseHandleServerEventParams) {
   const {
     transcriptItems,
@@ -109,6 +112,7 @@ export function useHandleServerEvent({
       let didTransfer = false;
       if (newAgentConfig) {
         setSelectedAgentName(newAgentConfig.name); // Use the name from the found config
+        setJustTransferred(true);
         didTransfer = true;
       }
 
@@ -127,7 +131,18 @@ export function useHandleServerEvent({
           output: JSON.stringify(functionCallOutput),
         },
       });
-      // trigger the next agent response after transfer
+      // simulate user greeting to prompt the new agent
+      const autoGreetingId = uuidv4().slice(0, 32);
+      addTranscriptMessage(autoGreetingId, "user", "hi", true);
+      sendClientEvent({
+        type: "conversation.item.create",
+        item: {
+          id: autoGreetingId,
+          type: "message",
+          role: "user",
+          content: [{ type: "input_text", text: "hi" }],
+        },
+      });
       sendClientEvent({ type: "response.create" });
       addTranscriptBreadcrumb(
         `function call: ${functionCallParams.name} response`,
