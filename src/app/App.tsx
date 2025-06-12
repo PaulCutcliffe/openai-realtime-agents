@@ -53,6 +53,7 @@ function App() {
     useState<boolean>(true);
   const [isPreviewDataVisible, setIsPreviewDataVisible] = useState<boolean>(false);
   const [currentReportFileId, setCurrentReportFileId] = useState<string | null>(null);
+  const [justTransferred, setJustTransferred] = useState<boolean>(false);
 
   const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
     if (dcRef.current && dcRef.current.readyState === "open") {
@@ -78,6 +79,7 @@ function App() {
     setSelectedAgentName,
     setCurrentReportFileId, // Pass setter
     setIsPreviewDataVisible, // Pass setter
+    setJustTransferred,
   });
 
   useEffect(() => {
@@ -116,7 +118,8 @@ function App() {
         `Agent: ${selectedAgentName}`,
         currentAgent
       );
-      updateSession(true);
+      updateSession(!justTransferred);
+      if (justTransferred) setJustTransferred(false);
     }
   }, [selectedAgentConfigSet, selectedAgentName, sessionStatus]);
 
