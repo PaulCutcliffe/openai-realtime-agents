@@ -7,6 +7,7 @@ import frontDeskAuthentication from "./frontDeskAuthentication";
 import customerServiceRetail from "./customerServiceRetail";
 import simpleExample from "./simpleExample";
 import educationalTool from "./educationalTool";
+import witnessInterviewer from "./witnessInterviewer";
 
 export const allAgentSets: AllAgentConfigsType = {
   comedyBot, 
@@ -17,6 +18,7 @@ export const allAgentSets: AllAgentConfigsType = {
   customerServiceRetail,
   simpleExample,
   educationalTool,
+  witnessInterviewer,
 };
 
 export const defaultAgentSetKey = "gardnersAgent";
