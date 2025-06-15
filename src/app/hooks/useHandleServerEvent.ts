@@ -70,7 +70,7 @@ export function useHandleServerEvent({
     );
 
     // Add breadcrumb with the final, correctly extracted args object
-    addTranscriptBreadcrumb(`function call: ${functionCallParams.name}`, args);
+    addTranscriptBreadcrumb(`function call: ${functionCallParams.name}`, args, true);
 
     // The rest of the function uses the 'args' object, which should now be correct
     if (currentAgent?.toolLogic?.[functionCallParams.name]) {
@@ -78,7 +78,8 @@ export function useHandleServerEvent({
       const fnResult = await fn(args, transcriptItems);
       addTranscriptBreadcrumb(
         `function call result: ${functionCallParams.name}`,
-        fnResult
+        fnResult,
+        true
       );
 
       // Check if the function result contains a reportFileId and set it
@@ -146,13 +147,15 @@ export function useHandleServerEvent({
       sendClientEvent({ type: "response.create" });
       addTranscriptBreadcrumb(
         `function call: ${functionCallParams.name} response`,
-        functionCallOutput
+        functionCallOutput,
+        true
       );
     } else {
       const simulatedResult = { result: true };
       addTranscriptBreadcrumb(
         `function call fallback: ${functionCallParams.name}`,
-        simulatedResult
+        simulatedResult,
+        true
       );
 
       sendClientEvent({
