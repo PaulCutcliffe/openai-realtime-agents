@@ -14,7 +14,12 @@ function contradicts(existing: string, incoming: string): boolean {
 
 async function fetchFacts(): Promise<string[]> {
   try {
-    const res = await fetch("/api/facts");
+    const baseUrl =
+      typeof window === "undefined"
+        ? process.env.NEXT_PUBLIC_BASE_URL ||
+          `http://localhost:${process.env.PORT || 3000}`
+        : "";
+    const res = await fetch(`${baseUrl}/api/facts`);
     const data = await res.json();
     if (Array.isArray(data.facts)) {
       return data.facts;
