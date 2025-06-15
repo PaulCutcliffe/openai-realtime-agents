@@ -1,6 +1,5 @@
 import { AgentConfig } from "@/app/types";
 import { facts } from "./factTracker";
-import { getAllFacts } from "@/app/lib/mongo";
 
 function contradicts(existing: string, incoming: string): boolean {
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
@@ -13,10 +12,23 @@ function contradicts(existing: string, incoming: string): boolean {
   return false;
 }
 
+async function fetchFacts(): Promise<string[]> {
+  try {
+    const res = await fetch("/api/facts");
+    const data = await res.json();
+    if (Array.isArray(data.facts)) {
+      return data.facts;
+    }
+  } catch (err) {
+    console.error("Failed to load facts", err);
+  }
+  return facts;
+}
+
 async function checkContradictions({ fact }: { fact: string }) {
   let allFacts = facts;
   try {
-    allFacts = await getAllFacts();
+    allFacts = await fetchFacts();
   } catch (err) {
     console.error("Failed to load facts", err);
   }
