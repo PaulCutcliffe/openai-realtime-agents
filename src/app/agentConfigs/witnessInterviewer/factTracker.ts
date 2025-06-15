@@ -1,11 +1,14 @@
 import { AgentConfig } from "@/app/types";
-import { insertFact, getAllFacts } from "@/app/lib/mongo";
 
 let facts: string[] = [];
 
 (async () => {
   try {
-    facts = await getAllFacts();
+    const res = await fetch("/api/facts");
+    const data = await res.json();
+    if (Array.isArray(data.facts)) {
+      facts = data.facts;
+    }
   } catch (err) {
     console.error("Failed to load facts", err);
   }
@@ -15,7 +18,11 @@ async function addFact({ fact }: { fact: string }) {
   if (fact) {
     facts.push(fact);
     try {
-      await insertFact(fact);
+      await fetch("/api/facts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fact }),
+      });
     } catch (err) {
       console.error("Failed to insert fact", err);
     }
