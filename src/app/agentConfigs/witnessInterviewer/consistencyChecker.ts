@@ -1,5 +1,6 @@
 import { AgentConfig } from "@/app/types";
 import { facts } from "./factTracker";
+import { getAllFacts } from "@/app/lib/mongo";
 
 function contradicts(existing: string, incoming: string): boolean {
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim();
@@ -12,8 +13,14 @@ function contradicts(existing: string, incoming: string): boolean {
   return false;
 }
 
-function checkContradictions({ fact }: { fact: string }) {
-  const contradictions = facts.filter((f) => contradicts(f, fact));
+async function checkContradictions({ fact }: { fact: string }) {
+  let allFacts = facts;
+  try {
+    allFacts = await getAllFacts();
+  } catch (err) {
+    console.error("Failed to load facts", err);
+  }
+  const contradictions = allFacts.filter((f) => contradicts(f, fact));
   return { contradictions };
 }
 
