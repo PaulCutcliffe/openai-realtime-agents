@@ -4,7 +4,12 @@ let facts: string[] = [];
 
 (async () => {
   try {
-    const res = await fetch("/api/facts");
+    const baseUrl =
+      typeof window === "undefined"
+        ? process.env.NEXT_PUBLIC_BASE_URL ||
+          `http://localhost:${process.env.PORT || 3000}`
+        : "";
+    const res = await fetch(`${baseUrl}/api/facts`);
     const data = await res.json();
     if (Array.isArray(data.facts)) {
       facts = data.facts;
@@ -18,7 +23,12 @@ async function addFact({ fact }: { fact: string }) {
   if (fact) {
     facts.push(fact);
     try {
-      await fetch("/api/facts", {
+      const baseUrl =
+        typeof window === "undefined"
+          ? process.env.NEXT_PUBLIC_BASE_URL ||
+            `http://localhost:${process.env.PORT || 3000}`
+          : "";
+      await fetch(`${baseUrl}/api/facts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fact }),
