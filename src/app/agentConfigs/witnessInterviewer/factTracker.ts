@@ -1,10 +1,24 @@
 import { AgentConfig } from "@/app/types";
+import { insertFact, getAllFacts } from "@/app/lib/mongo";
 
 let facts: string[] = [];
 
-function addFact({ fact }: { fact: string }) {
+(async () => {
+  try {
+    facts = await getAllFacts();
+  } catch (err) {
+    console.error("Failed to load facts", err);
+  }
+})();
+
+async function addFact({ fact }: { fact: string }) {
   if (fact) {
     facts.push(fact);
+    try {
+      await insertFact(fact);
+    } catch (err) {
+      console.error("Failed to insert fact", err);
+    }
   }
   return { facts };
 }
