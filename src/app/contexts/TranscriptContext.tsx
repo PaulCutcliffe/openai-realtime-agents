@@ -8,7 +8,11 @@ type TranscriptContextValue = {
   transcriptItems: TranscriptItem[];
   addTranscriptMessage: (itemId: string, role: "user" | "assistant", text: string, hidden?: boolean) => void;
   updateTranscriptMessage: (itemId: string, text: string, isDelta: boolean) => void;
-  addTranscriptBreadcrumb: (title: string, data?: Record<string, any>) => void;
+  addTranscriptBreadcrumb: (
+    title: string,
+    data?: Record<string, any>,
+    hidden?: boolean
+  ) => void;
   toggleTranscriptItemExpand: (itemId: string) => void;
   updateTranscriptItemStatus: (itemId: string, newStatus: "IN_PROGRESS" | "DONE") => void;
 };
@@ -68,7 +72,11 @@ export const TranscriptProvider: FC<PropsWithChildren> = ({ children }) => {
     );
   };
 
-  const addTranscriptBreadcrumb: TranscriptContextValue["addTranscriptBreadcrumb"] = (title, data) => {
+  const addTranscriptBreadcrumb: TranscriptContextValue["addTranscriptBreadcrumb"] = (
+    title,
+    data,
+    hidden = false
+  ) => {
     setTranscriptItems((prev) => [
       ...prev,
       {
@@ -80,7 +88,7 @@ export const TranscriptProvider: FC<PropsWithChildren> = ({ children }) => {
         timestamp: newTimestampPretty(),
         createdAtMs: Date.now(),
         status: "DONE",
-        isHidden: false,
+        isHidden: hidden,
       },
     ]);
   };
