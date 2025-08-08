@@ -54,6 +54,7 @@ function App() {
   const [isPreviewDataVisible, setIsPreviewDataVisible] = useState<boolean>(false);
   const [currentReportFileId, setCurrentReportFileId] = useState<string | null>(null);
   const [justTransferred, setJustTransferred] = useState<boolean>(false);
+  const [activeRealtimeModel, setActiveRealtimeModel] = useState<string | undefined>(undefined);
 
   const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
     if (dcRef.current && dcRef.current.readyState === "open") {
@@ -137,6 +138,10 @@ function App() {
     const tokenResponse = await fetch("/api/session");
     const data = await tokenResponse.json();
     logServerEvent(data, "fetch_session_token_response");
+
+    if (data?.realtime_model) {
+      setActiveRealtimeModel(data.realtime_model);
+    }
 
     if (!data.client_secret?.value) {
       logClientEvent(data, "error.no_ephemeral_key");
@@ -520,7 +525,8 @@ function App() {
         isAudioPlaybackEnabled={isAudioPlaybackEnabled}
         setIsAudioPlaybackEnabled={setIsAudioPlaybackEnabled}
         isPreviewDataVisible={isPreviewDataVisible} // Pass state
-        setIsPreviewDataVisible={setIsPreviewDataVisible} // Pass setter
+  setIsPreviewDataVisible={setIsPreviewDataVisible} // Pass setter
+  activeModel={activeRealtimeModel}
       />
     </div>
   );

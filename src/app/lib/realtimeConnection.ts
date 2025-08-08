@@ -21,7 +21,10 @@ export async function createRealtimeConnection(
   await pc.setLocalDescription(offer);
 
   const baseUrl = "https://api.openai.com/v1/realtime";
-  const model = "gpt-4o-mini-realtime-preview-2024-12-17";
+  // Use a public env var so it can be swapped without code changes; fallback to the current default
+  const model =
+    process.env.NEXT_PUBLIC_OPENAI_REALTIME_MODEL ||
+    "gpt-4o-mini-realtime-preview";
 
   const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
     method: "POST",

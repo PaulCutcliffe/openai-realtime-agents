@@ -15,6 +15,7 @@ interface BottomToolbarProps {
   setIsAudioPlaybackEnabled: (val: boolean) => void;
   isPreviewDataVisible: boolean; // Added prop
   setIsPreviewDataVisible: (val: boolean) => void; // Added prop
+  activeModel?: string; // New: show active model
 }
 
 function BottomToolbar({
@@ -31,6 +32,7 @@ function BottomToolbar({
   setIsAudioPlaybackEnabled,
   isPreviewDataVisible, // Added prop
   setIsPreviewDataVisible, // Added prop
+  activeModel,
 }: BottomToolbarProps) {
   const isConnected = sessionStatus === "CONNECTED";
   const isConnecting = sessionStatus === "CONNECTING";
@@ -132,6 +134,12 @@ function BottomToolbar({
           Preview Data
         </label>
       </div>
+
+      {activeModel && (
+        <div className="text-sm text-gray-600">
+          Model: <span className="font-mono">{activeModel}</span>
+        </div>
+      )}
     </div>
   );
 }
